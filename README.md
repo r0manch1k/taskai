@@ -7,3 +7,5 @@
 ```
 make start
 ```
+
+Проверить можно на `http://localhost`

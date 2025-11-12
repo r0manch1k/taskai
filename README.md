@@ -1,2 +1,9 @@
 # taskai
-telegram bot for organizing tasks with ai
+
+Телеграм Бот для создания и организации задач при помощи ИИ
+
+## Разработка
+
+```
+make start
+```

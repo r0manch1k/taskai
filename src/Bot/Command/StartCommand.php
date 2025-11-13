@@ -43,7 +43,7 @@ class StartCommand extends SystemCommand
     public function execute(): ServerResponse
     {
         return $this->replyToChat(
-            'ПРИВЕТ, ДАША :)'
+            'Hello, World!'
         );
     }
 }

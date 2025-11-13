@@ -18,7 +18,7 @@ class Bot extends Telegram
         parent::__construct($token, $username);
 
         try {
-            $this->addCommandsPaths([__DIR__ . '/src/Bot/Command']);
+            $this->addCommandsPaths([__DIR__ . '/Command']);
         } catch (TelegramException $e) {
             // Log telegram errors
             TelegramLog::error($e->getMessage());

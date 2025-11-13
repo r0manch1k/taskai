@@ -66,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -85,9 +85,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
       - name: PHP-CS-Fixer
-        uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.3
+        uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.4
         with:
           args: check --allow-risky=yes

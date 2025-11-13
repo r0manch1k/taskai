@@ -6,8 +6,6 @@ namespace App\Controller;
 
 use App\Bot\Bot;
 use Longman\TelegramBot\Exception\TelegramException;
-use Longman\TelegramBot\Exception\TelegramLogException;
-use Longman\TelegramBot\TelegramLog;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,16 +27,8 @@ final class BotController extends AbstractController
         try {
             $this->bot->handle();
         } catch (TelegramException $e) {
-            // Log telegram errors
-            TelegramLog::error($e->getMessage());
-            // Uncomment this to output any errors (ONLY FOR DEVELOPMENT!)
-            $this->logger->error($e);
-        } catch (TelegramLogException $e) {
-            // Uncomment this to output log initialisation errors (ONLY FOR DEVELOPMENT!)
-            // echo $e;
-            $this->logger->error($e);
+            $this->logger->error($e->getMessage());
         }
-
         return new Response('OK');
     }
 }

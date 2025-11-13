@@ -58,6 +58,7 @@ FROM frankenphp_base AS frankenphp_dev
 ENV APP_ENV=dev
 ENV XDEBUG_MODE=off
 ENV FRANKENPHP_WORKER_CONFIG=watch
+ENV TZ=Asia/Vladivostok
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 

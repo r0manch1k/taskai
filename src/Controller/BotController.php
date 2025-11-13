@@ -29,6 +29,7 @@ final class BotController extends AbstractController
         } catch (TelegramException $e) {
             $this->logger->error($e->getMessage());
         }
+
         return new Response('OK');
     }
 }

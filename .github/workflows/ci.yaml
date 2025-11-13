@@ -68,8 +68,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: none
+          tools: composer, psalm
+
       - name: Psalm
         uses: docker://ghcr.io/psalm/psalm-github-actions
+        with:
+          args: --no-cache
 
   php-cs-fixer:
     name: PHP-CS-Fixer
@@ -81,4 +90,4 @@ jobs:
       - name: PHP-CS-Fixer
         uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.3
         with:
-          args: check
+          args: check --allow-risky=yes

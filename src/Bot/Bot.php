@@ -21,7 +21,7 @@ class Bot extends Telegram
             $this->addCommandsPaths([__DIR__ . '/src/Bot/Command']);
         } catch (TelegramException $e) {
             // Log telegram errors
-            TelegramLog::error($e);
+            TelegramLog::error($e->getMessage());
             // Uncomment this to output any errors (ONLY FOR DEVELOPMENT!)
             // echo $e;
         } catch (TelegramLogException $e) {

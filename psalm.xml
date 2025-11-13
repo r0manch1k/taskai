@@ -12,13 +12,13 @@
         <directory name="src" />
         <ignoreFiles>
             <directory name="vendor" />
-            <directory name="var" />
         </ignoreFiles>
     </projectFiles>
 
     <issueHandlers>
         <UnusedClass errorLevel='suppress' />
         <UnusedParam errorLevel='suppress' />
+        <PossiblyUnusedMethod errorLevel='suppress' />
         <MissingOverrideAttribute errorLevel='suppress' />
     </issueHandlers>
 

@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class SetBotWebhookCommand extends Command
 {
-    private ?string $url = null;
+    private ?string $url;
 
     public function __construct(
         private Bot $bot,
@@ -30,7 +30,7 @@ class SetBotWebhookCommand extends Command
         $output->writeln('Введите URL:');
         $url = trim((string) readline('> '));
 
-        if (empty($url)) {
+        if (!isset($url)) {
             throw new RuntimeException('Пустой URL');
         }
 

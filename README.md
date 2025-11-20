@@ -1,2 +1,33 @@
 # taskai
-telegram bot for organizing tasks with ai
+
+Телеграм Бот для создания и организации задач в [Kaiten](https://kaiten.ru/features/) при помощи ИИ
+
+Шаблон для Symfony + Docker взят [отсюда](https://github.com/dunglas/symfony-docker?tab=readme-ov-file).
+
+## Разработка
+
+```
+make start
+```
+
+Проверить можно на `http://localhost`
+
+### Телеграм Бот
+
+```
+make webhook
+```
+
+Обращаю внимание на то, что используемый в шаблоне сервер _Caddy_ перенаправляет все запросы на _SERVER_NAME_ с HTTP на HTTPS (хоть его и не просили). Это ломает систему туннелинга при тестировании Телеграм Бота через вебхук. Поэтому рекомендую удостовериться, что следующие переменные в `.env` установлены именно таким образом:
+
+```sh
+SERVER_NAME='http://'
+HTTP_PORT=8079 # можно и 80, но он редиректит на 443
+```
+
+### Линтинг и форматирование
+
+```
+make csfix
+make psalm
+```

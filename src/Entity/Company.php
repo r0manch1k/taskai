@@ -28,6 +28,9 @@ class Company
     #[ORM\JoinColumn(nullable: false)]
     private ?BotUser $botUser = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $boardId = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -77,6 +80,18 @@ class Company
     public function setBotUser(?BotUser $botUser): static
     {
         $this->botUser = $botUser;
+
+        return $this;
+    }
+
+    public function getBoardId(): ?int
+    {
+        return $this->boardId;
+    }
+
+    public function setBoardId(?int $boardId): static
+    {
+        $this->boardId = $boardId;
 
         return $this;
     }

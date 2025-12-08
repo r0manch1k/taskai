@@ -6,6 +6,8 @@ namespace Longman\TelegramBot\Commands\SystemCommands;
 
 use App\Bot\Conversation\NewCompanyConversation;
 use App\Bot\Conversation\NewCompanyConversationStep;
+use App\Bot\Conversation\SelectBoardConversation;
+use App\Bot\Conversation\SelectBoardConversationStep;
 use App\Service\BotCacheService;
 use App\Service\BotResponseService;
 use App\Service\BotUserService;
@@ -53,6 +55,16 @@ class StartCommand extends SystemCommand
          */
         $bcs = $this->getConfig()['bcs'];
 
+        /**
+         * @var BotUserService
+         */
+        $bus = $this->getConfig()['bus'];
+
+        /**
+         * @var BotResponseService
+         */
+        $brs = $this->getConfig()['brs'];
+
         $message = $this->getMessage();
 
         $chat    = $message->getChat();
@@ -61,11 +73,6 @@ class StartCommand extends SystemCommand
         $user_id = $user->getId();
 
         $bcs->invalidateBotUser($chat_id, $user_id);
-
-        /**
-         * @var BotUserService
-         */
-        $bus = $this->getConfig()['bus'];
 
         $botUser = $bus->getBotUser($user_id);
         $companies = $botUser->getCompanies();
@@ -90,10 +97,14 @@ class StartCommand extends SystemCommand
         $keyboard->setOneTimeKeyboard(false);
         $keyboard->setSelective(false);
 
-        /**
-         * @var BotResponseService
-         */
-        $brs = $this->getConfig()['brs'];
+        $bcs->getConversation(
+            $chat_id,
+            $user_id,
+            new SelectBoardConversation(
+                SelectBoardConversationStep::SetSpace
+            ),
+            true
+        );
 
         return $this->replyToChat($brs->start(), [
             'reply_markup' => $keyboard,

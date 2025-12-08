@@ -22,6 +22,9 @@ class BotUser
     #[ORM\OneToMany(targetEntity: Company::class, mappedBy: 'botUser', orphanRemoval: true)]
     private Collection $companies;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $companyId = null;
+
     public function __construct(int $id)
     {
         $this->id = $id;
@@ -39,6 +42,17 @@ class BotUser
     public function getCompanies(): Collection
     {
         return $this->companies;
+    }
+
+    public function isCompanyExists(string $domain): ?Company
+    {
+        foreach ($this->getCompanies() as $company) {
+            if ($company->getDomain() === $domain) {
+                return $company;
+            }
+        }
+
+        return null;
     }
 
     public function addCompany(Company $company): static
@@ -59,6 +73,18 @@ class BotUser
                 $company->setBotUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCompanyId(): ?int
+    {
+        return $this->companyId;
+    }
+
+    public function setCompanyId(?int $companyId): static
+    {
+        $this->companyId = $companyId;
 
         return $this;
     }

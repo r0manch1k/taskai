@@ -20,8 +20,6 @@ class BotCacheService
      * Отдаёт или устанавливает текущий диалог в кэш.
      * Предполагается, что для определенного пользователя в определённом чате
      * может быть только один действующий диалог.
-     *
-     * @param object $conversation
      */
     public function getConversation(int $chat_id, int $user_id, ?object $conversation = null, bool $reset = false): ?object
     {

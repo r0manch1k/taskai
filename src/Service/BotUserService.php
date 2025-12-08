@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Entity\BotUser;
 use App\Entity\Company;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
 class BotUserService
@@ -30,7 +31,7 @@ class BotUserService
         return $botUser;
     }
 
-    public function addCompanyToUser(BotUser $botUser, Company $company): Company
+    public function setCompany(BotUser $botUser, Company $company): Company
     {
         $exist = null;
 
@@ -55,5 +56,26 @@ class BotUserService
         $this->entityManager->flush();
 
         return $company;
+    }
+
+    public function setCompanyId(BotUser $botUser, int $companyId): Company
+    {
+        $exist = null;
+
+        foreach ($botUser->getCompanies() as $c) {
+            if ($c->getId() === $companyId) {
+                $exist = $c;
+                break;
+            }
+        }
+
+        if (null === $exist) {
+            throw new InvalidArgumentException("Компании с ID {$companyId} не существует у этого пользователя.");
+        }
+
+        $botUser->setCompanyId($companyId);
+        $this->entityManager->flush();
+
+        return $exist;
     }
 }

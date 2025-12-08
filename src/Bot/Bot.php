@@ -7,6 +7,7 @@ namespace App\Bot;
 use App\Service\BotCacheService;
 use App\Service\BotResponseService;
 use App\Service\BotUserService;
+use App\Service\CompanyService;
 use App\Service\KaitenApiService;
 use Longman\TelegramBot\Telegram;
 use Psr\Log\LoggerInterface;
@@ -21,6 +22,7 @@ class Bot extends Telegram
         private BotUserService $bus,
         private LoggerInterface $logger,
         private KaitenApiService $kas,
+        private CompanyService $cs,
     ) {
         parent::__construct($token, $username);
 
@@ -36,6 +38,7 @@ class Bot extends Telegram
                 'bus' => $this->bus,
                 'logger' => $this->logger,
                 'kas' => $this->kas,
+                'cs' => $this->cs,
             ]);
         }
     }

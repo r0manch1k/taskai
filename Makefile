@@ -73,3 +73,19 @@ csfix: php-cs-fixer
 psalm:
 	@$(eval c ?=)
 	@$(PHP) ./vendor/bin/psalm $(c)
+
+migrations-clean:
+	rm -f migrations/*.php
+
+# Doctrine
+doctrine-drop: c=doctrine:database:drop --force
+doctrine-drop: sf
+
+doctrine-create: c=doctrine:database:create
+doctrine-create: sf
+
+doctrine-diff: c=doctrine:migrations:diff --formatted
+doctrine-diff: sf
+
+doctrine-migrate: c=doctrine:migrations:migrate
+doctrine-migrate: sf

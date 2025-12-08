@@ -131,9 +131,6 @@ class GenericmessageCommand extends SystemCommand
 
                     $bus->setCompanyId($botUser, $company->getId());
 
-                    /**
-                     * @var SpaceDto[]
-                     */
                     $spaces = $kas->getSpaces($botUser);
 
                     if (empty($spaces)) {

@@ -70,7 +70,8 @@ class KaitenApiService
         $token = $company->getToken();
 
         if (empty($token)) {
-            $this->logger->error(sprintf('Пустой токен'));
+            $this->logger->error('Пустой токен');
+
             return [];
         }
 
@@ -140,7 +141,8 @@ class KaitenApiService
         $token = $company->getToken();
 
         if (empty($token)) {
-            $this->logger->error(sprintf('Пустой токен'));
+            $this->logger->error('Пустой токен');
+
             return [];
         }
 

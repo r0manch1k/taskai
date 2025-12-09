@@ -8,7 +8,6 @@ use App\Bot\Conversation\NewCompanyConversation;
 use App\Bot\Conversation\NewCompanyConversationStep;
 use App\Bot\Conversation\SelectBoardConversation;
 use App\Bot\Conversation\SelectBoardConversationStep;
-use App\Dto\BoardDto;
 use App\Entity\Company;
 use App\Service\BotCacheService;
 use App\Service\BotResponseService;

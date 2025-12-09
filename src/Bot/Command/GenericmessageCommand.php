@@ -186,9 +186,6 @@ class GenericmessageCommand extends SystemCommand
 
                     $cs->setSpaceId($company, $space->id);
 
-                    /**
-                     * @var BoardDto[]
-                     */
                     $boards = $kas->getBoards($botUser);
 
                     if (empty($boards)) {

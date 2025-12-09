@@ -117,7 +117,7 @@ class KaitenApiService
     /**
      * Summary of getBoards.
      *
-     * @return array<array|BoardDto>
+     * @return BoardDto[]
      */
     public function getBoards(BotUser $botUser): array
     {

@@ -28,19 +28,15 @@ class CompanyService
         return $company;
     }
 
-    public function setSpaceId(Company $company, int $spaceId): bool
+    public function setSpaceId(Company $company, int $spaceId): void
     {
         $company->setSpaceId($spaceId);
         $this->entityManager->flush();
-
-        return true;
     }
 
-    public function setBoardId(Company $company, int $boardId): bool
+    public function setBoardId(Company $company, int $boardId): void
     {
         $company->setBoardId($boardId);
         $this->entityManager->flush();
-
-        return true;
     }
 }

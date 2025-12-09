@@ -25,7 +25,7 @@ class SelectBoardConversation
         /**
          * @var BoardDto[]
          */
-        public $boards = [],
+        public array $boards = [],
     ) {
     }
 }

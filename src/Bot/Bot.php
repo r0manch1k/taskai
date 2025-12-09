@@ -30,7 +30,7 @@ class Bot extends Telegram
 
         // Не нашёл как сделать нормальный Dependency Injection в команды
         $commands = $this->getCommandsList();
-        $logger->critical(json_encode($commands, JSON_PRETTY_PRINT));
+
         foreach ($commands as $name => $_) {
             $this->setCommandConfig($name, [
                 'brs' => $this->brs,

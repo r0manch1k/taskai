@@ -12,12 +12,13 @@ enum NewCompanyConversationStep: string
     case Done = 'done';
 }
 
-class NewCompanyConversation
+final class NewCompanyConversation extends Conversation
 {
     public function __construct(
-        public NewCompanyConversationStep $step,
+        NewCompanyConversationStep $step,
         public ?string $domain = null,
         public ?string $token = null,
     ) {
+        parent::__construct($step);
     }
 }

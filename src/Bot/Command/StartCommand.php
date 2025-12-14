@@ -82,8 +82,7 @@ class StartCommand extends SystemCommand
             $buttons[] = [$company->getDomain()];
         }
 
-        // Почему-то без импорта NewCompanyConversation не видит
-        // NewCompanyConversationStep (пхп мОмент)
+        // Почему-то без импорта NewCompanyConversation не видит NewCompanyConversationStep
         new NewCompanyConversation(NewCompanyConversationStep::Start);
 
         $buttons[] = [NewCompanyConversationStep::Start->value];
@@ -97,6 +96,10 @@ class StartCommand extends SystemCommand
         $keyboard->setOneTimeKeyboard(false);
         $keyboard->setSelective(false);
 
+        // По умолчанию ожидается, что существует корпоративный аккаунт и
+        // поэтому начинается диалог выбора доски, но если пользователь
+        // выбирает опцию добавления новаого аккаунта, то диалог в
+        // кэше перезапишется в GenericmessageCommand
         $bcs->getConversation(
             $chat_id,
             $user_id,

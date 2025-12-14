@@ -14,10 +14,10 @@ enum SelectBoardConversationStep: string
     case Done = 'done';
 }
 
-class SelectBoardConversation
+final class SelectBoardConversation extends Conversation
 {
     public function __construct(
-        public SelectBoardConversationStep $step,
+        SelectBoardConversationStep $step,
         /**
          * @var SpaceDto[]
          */
@@ -27,5 +27,6 @@ class SelectBoardConversation
          */
         public array $boards = [],
     ) {
+        parent::__construct($step);
     }
 }

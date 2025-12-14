@@ -12,6 +12,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: BotUserRepository::class)]
 class BotUser
 {
+    /**
+     * Используется ID пользователя в Телеграм
+     */
     #[ORM\Id]
     #[ORM\Column]
     private ?int $id = null;

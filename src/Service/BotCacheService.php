@@ -21,9 +21,9 @@ class BotCacheService
      * Предполагается, что для определенного пользователя в определённом чате
      * может быть только один действующий диалог.
      */
-    public function getConversation(int $chat_id, int $user_id, ?object $conversation = null, bool $reset = false): ?object
+    public function getConversation(int $chatId, int $userId, ?object $conversation = null, bool $reset = false): ?object
     {
-        $key = sprintf('%s_%s_conversation', $chat_id, $user_id);
+        $key = sprintf('%s_%s_conversation', $chatId, $userId);
 
         if ($reset) {
             $this->botCache->delete($key);
@@ -31,8 +31,8 @@ class BotCacheService
 
         $cache = $this->botCache->get(
             $key,
-            function (ItemInterface $item) use ($chat_id, $user_id, $conversation): object|null {
-                $item->tag([sprintf('%s_%s', $chat_id, $user_id)]);
+            function (ItemInterface $item) use ($chatId, $userId, $conversation): object|null {
+                $item->tag([sprintf('%s_%s', $chatId, $userId)]);
                 $item->expiresAfter(600);
 
                 return $conversation;
@@ -42,8 +42,8 @@ class BotCacheService
         return $cache;
     }
 
-    public function invalidateBotUser(int $chat_id, int $user_id): void
+    public function invalidateBotUser(int $chatId, int $userId): void
     {
-        $this->botCache->invalidateTags([sprintf('%s_%s', $chat_id, $user_id)]);
+        $this->botCache->invalidateTags([sprintf('%s_%s', $chatId, $userId)]);
     }
 }

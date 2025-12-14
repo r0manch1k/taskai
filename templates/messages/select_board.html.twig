@@ -1,0 +1,14 @@
+{% if conversation.step.value == 'set_space' %}
+Выберите пространство:
+
+<i>Вы всегда сможете сменить его, начав сначала</i>
+{% elseif conversation.step.value == 'set_board' %}
+Выберите доску:
+
+<i>Вы всегда сможете сменить её, начав сначала</i>
+{% elseif conversation.step.value == 'done' %}
+Успешно!
+{% else %}
+<i>Что-то пошло не так!</i>
+Пожалуйста, перезапустите бота через /start.
+{% endif %}

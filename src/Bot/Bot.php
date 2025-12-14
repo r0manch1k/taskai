@@ -4,29 +4,42 @@ declare(strict_types=1);
 
 namespace App\Bot;
 
-use Longman\TelegramBot\Exception\TelegramException;
-use Longman\TelegramBot\Exception\TelegramLogException;
+use App\Service\BotCacheService;
+use App\Service\BotResponseService;
+use App\Service\BotUserService;
+use App\Service\CompanyService;
+use App\Service\KaitenApiService;
 use Longman\TelegramBot\Telegram;
-use Longman\TelegramBot\TelegramLog;
+use Psr\Log\LoggerInterface;
 
 class Bot extends Telegram
 {
     public function __construct(
         string $token,
         string $username,
+        private BotResponseService $brs,
+        private BotCacheService $bcs,
+        private BotUserService $bus,
+        private LoggerInterface $logger,
+        private KaitenApiService $kas,
+        private CompanyService $cs,
     ) {
         parent::__construct($token, $username);
 
-        try {
-            $this->addCommandsPaths([__DIR__ . '/Command']);
-        } catch (TelegramException $e) {
-            // Log telegram errors
-            TelegramLog::error($e->getMessage());
-            // Uncomment this to output any errors (ONLY FOR DEVELOPMENT!)
-            // echo $e;
-        } catch (TelegramLogException $e) {
-            // Uncomment this to output log initialisation errors (ONLY FOR DEVELOPMENT!)
-            // echo $e;
+        $this->addCommandsPaths([__DIR__ . '/Command']);
+
+        // Не нашёл как сделать нормальный Dependency Injection в команды
+        $commands = $this->getCommandsList();
+
+        foreach ($commands as $name => $_) {
+            $this->setCommandConfig($name, [
+                'brs' => $this->brs,
+                'bcs' => $this->bcs,
+                'bus' => $this->bus,
+                'logger' => $this->logger,
+                'kas' => $this->kas,
+                'cs' => $this->cs,
+            ]);
         }
     }
 }

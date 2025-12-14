@@ -22,5 +22,9 @@ services:
       # Ensure that host.docker.internal is correctly defined on Linux
       - host.docker.internal:host-gateway
     tty: true
+
+  postgres:
+    ports:
+      - "5432"
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###

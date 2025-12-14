@@ -18,8 +18,11 @@
     <issueHandlers>
         <UnusedClass errorLevel='suppress' />
         <UnusedParam errorLevel='suppress' />
+        <UnusedProperty errorLevel='suppress' />
         <PossiblyUnusedMethod errorLevel='suppress' />
         <MissingOverrideAttribute errorLevel='suppress' />
+        <PossiblyUnusedReturnValue errorLevel='suppress' />
+        <UndefinedThisPropertyFetch errorLevel='suppress' />
     </issueHandlers>
 
     <plugins>

@@ -23,7 +23,6 @@ final class BotController extends AbstractController
     #[Route('/bot/webhook', name: 'bot_webhook')]
     public function webhook(Request $request): Response
     {
-        $this->logger->warning($request->getContent());
         try {
             $this->bot->handle();
         } catch (TelegramException $e) {

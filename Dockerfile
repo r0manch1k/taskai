@@ -21,6 +21,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	file \
 	git \
 	make \
+	librabbitmq-dev \
+    && pecl install amqp \
+    && docker-php-ext-enable amqp \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \

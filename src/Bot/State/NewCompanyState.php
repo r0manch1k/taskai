@@ -77,9 +77,9 @@ final class NewCompanyState implements StateInterface
             case NewCompanyConversationStep::Done:
                 $token = $text;
 
-                $ok = $context->kas->ping($conversation->domain, $token);
+                $kaitenUser = $context->kas->getCurrentUser($conversation->domain, $token);
 
-                if (!$ok) {
+                if (!$kaitenUser->id) {
                     $data['text'] = 'Ключ доступа не прошёл проверку. Введите другой!';
 
                     return Request::sendMessage($data);
@@ -92,6 +92,7 @@ final class NewCompanyState implements StateInterface
                     $company->setDomain($conversation->domain);
                 }
 
+                $company->setUserID($kaitenUser->id);
                 $company->setToken($token);
 
                 $context->bus->setCompany($context->botUser, $company);

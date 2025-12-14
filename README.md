@@ -38,9 +38,20 @@ POSTGRES_PORT='5432'
 
 ```
 REDIS_PORT='6379'
-REDIS_PASSWORD=redis_pass
+REDIS_PASSWORD='redis_pass'
 REDIS_URL=redis://${REDIS_PASSWORD}@redis:6379
 ```
+
+В качетсве брокера сообщений для создания задач с использованием ИИ Агента используется RabbitMQ. Для настройки используются переменные окружения
+
+```
+RABBITMQ_HOST='rabbitmq'
+RABBITMQ_PORT='5672'
+RABBITMQ_USER='guest'
+RABBITMQ_PASSWORD='guest'
+```
+
+Веб-интерфейс доступен на http://localhost:5672/
 
 Для удобного взаимодействия с Doctrine в `Makefile` есть основные команды. Для работы базы данных необходимо выполнить
 

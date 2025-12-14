@@ -6,6 +6,7 @@ namespace App\Service;
 
 use App\Dto\BoardDto;
 use App\Dto\SpaceDto;
+use App\Dto\UserDto;
 use App\Entity\BotUser;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
@@ -19,11 +20,11 @@ class KaitenApiService
     ) {
     }
 
-    public function ping(string $domain, string $token): bool
+    public function getCurrentUser(string $domain, string $token): UserDto
     {
         $client = HttpClient::create();
 
-        $url = sprintf('https://%s.kaiten.ru/api/v1/spaces', $domain);
+        $url = sprintf('https://%s.kaiten.ru/api/v1/users/current', $domain);
 
         try {
             $response = $client->request('GET', $url, [
@@ -38,15 +39,22 @@ class KaitenApiService
             if (200 != $response->getStatusCode()) {
                 $this->logger->warning(sprintf('Не удалось успешно проверить токен! Статус ответа: %s', $response->getStatusCode()));
 
-                return false;
+                return new UserDto(null, null);
             }
 
-            return true;
+            $data = $response->toArray();
+
+            $user = new UserDto(
+                    id: $data['id'] ?? 0,
+                    email: $data['email'] ?? '',
+                );
+
+            return $user;
 
         } catch (Throwable $e) {
             $this->logger->error(sprintf('Ошибка при получении ответа с %s', $url));
 
-            return false;
+            return new UserDto(null, null);
         }
     }
 

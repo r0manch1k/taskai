@@ -18,7 +18,7 @@ final class SelectBoardState implements StateInterface
     public function handle(Context $context, Conversation $conversation): ServerResponse
     {
         if (!$conversation instanceof SelectBoardConversation) {
-            throw new InvalidArgumentException('Ожидалось NewCompanyConversation');
+            throw new InvalidArgumentException('Ожидалось SelectBoardConversation');
         }
 
         $chatId = $context->chatId;

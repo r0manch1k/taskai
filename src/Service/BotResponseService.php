@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Bot\Conversation\GenerateCardConversation;
 use App\Bot\Conversation\NewCompanyConversation;
 use App\Bot\Conversation\SelectBoardConversation;
 use Psr\Log\LoggerInterface;
@@ -32,6 +33,11 @@ class BotResponseService
     public function selectCompany(SelectBoardConversation $conversation): string
     {
         return $this->twig->render('messages/select_board.html.twig', ['conversation' => $conversation]);
+    }
+
+    public function generateCard(GenerateCardConversation $conversation): string
+    {
+        return $this->twig->render('messages/generate_card.html.twig', ['conversation' => $conversation]);
     }
 
     public function error(): string

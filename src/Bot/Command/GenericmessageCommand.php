@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
 use App\Bot\Context;
+use App\Bot\Conversation\GenerateCardConversation;
+use App\Bot\Conversation\GenerateCardConversationStep;
 use App\Bot\Conversation\NewCompanyConversation;
 use App\Bot\Conversation\NewCompanyConversationStep;
 use App\Bot\Resolver;
@@ -16,6 +18,7 @@ use App\Service\KaitenApiService;
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Exception\TelegramException;
+use Longman\TelegramBot\Request;
 use Psr\Log\LoggerInterface;
 
 class GenericmessageCommand extends SystemCommand
@@ -97,9 +100,23 @@ class GenericmessageCommand extends SystemCommand
                     true
                 );
                 break;
+            case GenerateCardConversationStep::Start->value:
+                $bcs->getConversation(
+                    $chatId,
+                    $userId,
+                    new GenerateCardConversation(
+                        GenerateCardConversationStep::SetRawDescription
+                    ),
+                    true
+                );
+                break;
         }
 
         $conversation = $bcs->getConversation($chatId, $userId);
+
+        if ($conversation === null) {
+            return Request::emptyResponse();
+        }
 
         $resolver = new Resolver();
 

@@ -16,6 +16,7 @@ use App\Service\BotUserService;
 use App\Service\CompanyService;
 use App\Service\KaitenApiService;
 use Longman\TelegramBot\Commands\SystemCommand;
+use Longman\TelegramBot\Entities\Keyboard;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
@@ -85,8 +86,9 @@ class GenericmessageCommand extends SystemCommand
 
         $context = new Context($chatId, $botUser, $this->telegram, $text, $brs, $bcs, $bus, $logger, $kas, $cs);
 
-        // Почему-то без импорта NewCompanyConversation не видит NewCompanyConversationStep
+        // Баг импорта
         new NewCompanyConversation(NewCompanyConversationStep::Start);
+        new GenerateCardConversation(GenerateCardConversationStep::Start);
 
         // Начинаем диалоги, если введено стартовое сообщение для них
         switch ($text) {
@@ -114,8 +116,15 @@ class GenericmessageCommand extends SystemCommand
 
         $conversation = $bcs->getConversation($chatId, $userId);
 
-        if ($conversation === null) {
-            return Request::emptyResponse();
+        if (null === $conversation) {
+                $data = [
+                'parse_mode' => 'HTML',
+                'reply_markup' => Keyboard::remove(),
+                'chat_id'      => $chatId,
+                'text' => $context->brs->unknown()
+            ];
+
+            return Request::sendMessage($data);
         }
 
         $resolver = new Resolver();

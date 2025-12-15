@@ -45,9 +45,9 @@ class KaitenApiService
             $data = $response->toArray();
 
             $user = new UserDto(
-                    id: $data['id'] ?? 0,
-                    email: $data['email'] ?? '',
-                );
+                id: $data['id'] ?? 0,
+                email: $data['email'] ?? '',
+            );
 
             return $user;
 
@@ -191,6 +191,86 @@ class KaitenApiService
 
         } catch (Throwable $e) {
             $this->logger->error(sprintf('Ошибка при запросе %s: %s', $url, $e->getMessage()));
+
+            return [];
+        }
+    }
+
+    /**
+     * Summary of getSpaceUsers.
+     *
+     * @return UserDto[]
+     */
+    public function getSpaceUsers(BotUser $botUser): array
+    {
+        $companyId = $botUser->getCompanyId();
+        if (null === $companyId) {
+            $this->logger->warning('У пользователя нет выбранной компании.');
+
+            return [];
+        }
+
+        $company = $this->cs->getCompany($companyId);
+
+        $spaceId = $company->getSpaceId();
+        if (null === $spaceId) {
+            $this->logger->warning('У пользователя в выбранной компании нет выбранного пространства.');
+
+            return [];
+        }
+
+        $domain = $company->getDomain();
+        $token  = $company->getToken();
+
+        if (empty($token)) {
+            $this->logger->error('Пустой токен');
+
+            return [];
+        }
+
+        $client = HttpClient::create();
+        $url = sprintf('https://%s.kaiten.ru/api/latest/spaces/%s/users', $domain, $spaceId);
+
+        try {
+            $response = $client->request('GET', $url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token,
+                    'Accept'        => 'application/json',
+                    'Content-Type'  => 'application/json',
+                ],
+                'timeout' => 5,
+            ]);
+
+            if (200 !== $response->getStatusCode()) {
+                $this->logger->warning(sprintf(
+                    'Не удалось получить пользователей пространства. Код ответа: %s',
+                    $response->getStatusCode()
+                ));
+
+                return [];
+            }
+
+            $data = $response->toArray();
+
+            /**
+             * @var UserDto[]
+             */
+            $users = [];
+            foreach ($data as $user) {
+                $users[] = new UserDto(
+                    id: $user['id'] ?? 0,
+                    email: $user['email'] ?? '',
+                );
+            }
+
+            return $users;
+
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf(
+                'Ошибка при запросе %s: %s',
+                $url,
+                $e->getMessage()
+            ));
 
             return [];
         }

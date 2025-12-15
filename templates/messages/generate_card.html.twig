@@ -7,11 +7,43 @@
 {% elseif conversation.step.value == 'set_asap' %}
 Это срочная задача?
 {% elseif conversation.step.value == 'set_due_date' %}
-Укажите дату выполнения (ISO 8601):
+Укажите дату выполнения вплоть до минут (формат ISO 8601):
 
-<i>Пример: 2005-08-09 или 2005-08-09T18:31:42</i>
+<i>Пример: 2005-08-09 или 2005-08-09T18:31</i>
 {% elseif conversation.step.value == 'set_responsible' %}
 Выберите ответственного за выполнение:
+{% elseif conversation.step.value == 'confirm' %}
+<i>Подтвердите создание задачи:</i>
+
+<b>Описание:</b>
+{{ conversation.rawDescription ?: '—' }}
+
+<b>Срочно:</b>
+{% if conversation.asap is same as(true) %}
+Да
+{% elseif conversation.asap is same as(false) %}
+Нет
+{% else %}
+Не указано
+{% endif %}
+
+<b>Срок выполнения:</b>
+{% if conversation.dueDate %}
+{% if conversation.dueDateTimePresent %}
+{{ conversation.dueDate }}
+{% else %}
+{{ conversation.dueDate }} (до конца дня)
+{% endif %}
+{% else %}
+Не указан
+{% endif %}
+
+<b>Ответственный:</b>
+{% if conversation.responsibleEmail %}
+{{ conversation.responsibleEmail }}
+{% else %}
+Не указан
+{% endif %}
 {% else %}
 <i>Ошибка при составление запроса на генерацию задачи!</i>
 

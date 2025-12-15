@@ -16,7 +16,7 @@ class GenerateCardMessage
         private string $dueDate,
         private bool $dueDateTimePresent,
         private int $ownerId,
-        private int $responsibleId
+        private int $responsibleId,
     ) {
     }
 

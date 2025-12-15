@@ -6,6 +6,7 @@ namespace App\Bot\State;
 
 use App\Bot\Context;
 use App\Bot\Conversation\Conversation;
+use App\Bot\Conversation\GenerateCardConversationStep;
 use App\Bot\Conversation\SelectBoardConversation;
 use App\Bot\Conversation\SelectBoardConversationStep;
 use InvalidArgumentException;
@@ -58,7 +59,6 @@ final class SelectBoardState implements StateInterface
                 $data['text'] = $context->brs->selectCompany($conversation);
 
                 $buttons = [];
-
                 foreach ($spaces as $space) {
                     $buttons[] = [$space->title];
                 }
@@ -98,6 +98,18 @@ final class SelectBoardState implements StateInterface
                 if (null === $space) {
                     $data['text'] = 'Указанное пространство не найдено. Попробуйте ещё раз.';
 
+                    $buttons = [];
+                    foreach ($spaces as $space) {
+                        $buttons[] = [$space->title];
+                    }
+
+                    /**
+                     * @psalm-suppress TooManyArguments
+                     */
+                    $keyboard = new Keyboard(...$buttons);
+
+                    $data['reply_markup'] = $keyboard;
+
                     return Request::sendMessage($data);
                 }
 
@@ -114,7 +126,6 @@ final class SelectBoardState implements StateInterface
                 $data['text'] = $context->brs->selectCompany($conversation);
 
                 $buttons = [];
-
                 foreach ($boards as $board) {
                     $buttons[] = [$board->title];
                 }
@@ -155,6 +166,18 @@ final class SelectBoardState implements StateInterface
                 if (null === $board) {
                     $data['text'] = 'Указанная доска не найдена. Попробуйте ещё раз.';
 
+                    $buttons = [];
+                    foreach ($boards as $board) {
+                        $buttons[] = [$board->title];
+                    }
+
+                    /**
+                     * @psalm-suppress TooManyArguments
+                     */
+                    $keyboard = new Keyboard(...$buttons);
+
+                    $data['reply_markup'] = $keyboard;
+
                     return Request::sendMessage($data);
                 }
 
@@ -162,7 +185,7 @@ final class SelectBoardState implements StateInterface
 
                 $data['text'] = $context->brs->selectCompany($conversation);
 
-                $buttons = ['Создать задачу'];
+                $buttons = [GenerateCardConversationStep::Start->value];
 
                 /**
                  * @psalm-suppress TooManyArguments

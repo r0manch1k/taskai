@@ -28,3 +28,7 @@ services:
         arguments:
             $bot: '@App\Bot\Bot'
         tags: ["console.command"]
+
+    App\Service\OpenRouterApiService:
+        arguments:
+            $apiKey: "%env(OPENROUTER_API_KEY)%"

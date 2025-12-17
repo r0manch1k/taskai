@@ -21,6 +21,7 @@ use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class GenericmessageCommand extends SystemCommand
 {
@@ -76,6 +77,11 @@ class GenericmessageCommand extends SystemCommand
          */
         $cs = $this->getConfig()['cs'];
 
+        /**
+         * @var MessageBusInterface
+         */
+        $mbus = $this->getConfig()['mbus'];
+
         $message = $this->getMessage();
         $chat = $message->getChat();
         $user = $message->getFrom();
@@ -84,7 +90,7 @@ class GenericmessageCommand extends SystemCommand
         $text = trim($message->getText(true));
         $botUser = $bus->getBotUser($chatId);
 
-        $context = new Context($chatId, $botUser, $this->telegram, $text, $brs, $bcs, $bus, $logger, $kas, $cs);
+        $context = new Context($chatId, $botUser, $this->telegram, $text, $brs, $bcs, $bus, $logger, $kas, $cs, $mbus);
 
         // Баг импорта
         new NewCompanyConversation(NewCompanyConversationStep::Start);
@@ -117,11 +123,11 @@ class GenericmessageCommand extends SystemCommand
         $conversation = $bcs->getConversation($chatId, $userId);
 
         if (null === $conversation) {
-                $data = [
+            $data = [
                 'parse_mode' => 'HTML',
                 'reply_markup' => Keyboard::remove(),
                 'chat_id'      => $chatId,
-                'text' => $context->brs->unknown()
+                'text' => $context->brs->unknown(),
             ];
 
             return Request::sendMessage($data);

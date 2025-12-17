@@ -8,6 +8,7 @@ use App\Bot\Context;
 use App\Bot\Conversation\Conversation;
 use App\Bot\Conversation\GenerateCardConversation;
 use App\Bot\Conversation\GenerateCardConversationStep;
+use App\Message\GenerateCardMessage;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use Longman\TelegramBot\Entities\Keyboard;
@@ -265,7 +266,23 @@ final class GenerateCardState implements StateInterface
 
                         return Request::sendMessage($data);
                     case 'Подтвердить':
-                        $data['text'] = 'Подтверждено. Задача будет создана и ссылка на неё появится в чате.';
+                        $company = $context->cs->getCompany($context->botUser->getCompanyId());
+
+                        $message = new GenerateCardMessage(
+                            $context->botUser->getCompanyId(),
+                            $chatId,
+                            $context->botUser,
+                            $conversation->rawDescription,
+                            $conversation->asap,
+                            $conversation->dueDate,
+                            $conversation->dueDateTimePresent,
+                            $company->getUserId(),
+                            $conversation->responsibleId
+                        );
+
+                        $context->mbus->dispatch($message);
+
+                        $data['text'] = 'Подтверждено. Задача будет создана и ссылка на неё появится в чате.' . PHP_EOL . PHP_EOL . 'Вы можете начать заново /start.';
 
                         return Request::sendMessage($data);
                 }

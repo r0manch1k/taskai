@@ -12,6 +12,7 @@ use App\Service\CompanyService;
 use App\Service\KaitenApiService;
 use Longman\TelegramBot\Telegram;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 final class Context
 {
@@ -26,6 +27,7 @@ final class Context
         public LoggerInterface $logger,
         public KaitenApiService $kas,
         public CompanyService $cs,
+        public MessageBusInterface $mbus,
     ) {
     }
 }

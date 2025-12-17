@@ -29,11 +29,6 @@
 
 <b>Срок выполнения:</b>
 {% if conversation.dueDate %}
-{% if conversation.dueDateTimePresent %}
-{{ conversation.dueDate }}
-{% else %}
-{{ conversation.dueDate }} (до конца дня)
-{% endif %}
 {% else %}
 Не указан
 {% endif %}

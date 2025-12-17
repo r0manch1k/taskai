@@ -75,6 +75,9 @@ jobs:
           coverage: none
           tools: composer, psalm
 
+      - name: Install php-amqp
+        run: sudo apt-get update && sudo apt-get install -y php-amqp
+
       - name: Psalm
         uses: docker://ghcr.io/psalm/psalm-github-actions
         with:
@@ -86,6 +89,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+
+      - name: Install php-amqp
+        run: sudo apt-get update && sudo apt-get install -y php-amqp
 
       - name: PHP-CS-Fixer
         uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.4

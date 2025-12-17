@@ -183,12 +183,12 @@ final class GenerateCardState implements StateInterface
                 $email = $text;
 
                 /**
-                 * @var int
+                 * @var ?int
                  */
                 $responsibleId = null;
 
                 /**
-                 * @var string
+                 * @var ?string
                  */
                 $responsibleEmail = null;
 

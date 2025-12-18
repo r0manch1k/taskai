@@ -6,6 +6,7 @@ namespace App\Service;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Throwable;
 
 class OpenRouterApiService
 {
@@ -38,7 +39,7 @@ class OpenRouterApiService
             );
 
             $statusCode = $response->getStatusCode();
-            if ($statusCode !== 200) {
+            if (200 !== $statusCode) {
                 $this->logger->error('OpenRouter API вернул некорректный HTTP-статус', [
                     'status_code' => $statusCode,
                 ]);
@@ -49,8 +50,8 @@ class OpenRouterApiService
             $data = $response->toArray(false);
 
             if (
-                !isset($data['choices'][0]['message']['content']) ||
-                !is_string($data['choices'][0]['message']['content'])
+                !isset($data['choices'][0]['message']['content'])
+                || !is_string($data['choices'][0]['message']['content'])
             ) {
                 $this->logger->error('Неожиданный формат ответа от OpenRouter API', [
                     'response' => $data,
@@ -60,7 +61,7 @@ class OpenRouterApiService
             }
 
             return $data['choices'][0]['message']['content'];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->logger->error('Ошибка при выполнении запроса к OpenRouter API', [
                 'exception' => $e,
             ]);

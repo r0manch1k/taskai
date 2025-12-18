@@ -515,13 +515,6 @@ class KaitenApiService
 
         $company = $this->cs->getCompany($companyId);
 
-        $spaceId = $company->getSpaceId();
-        if (null === $spaceId) {
-            $this->logger->warning('У пользователя в выбранной компании нет выбранного пространства.');
-
-            return '';
-        }
-
         $domain = $company->getDomain();
 
         $url = sprintf('https://%s.kaiten.ru/space/%s/boards/card/%s', $domain, $spaceId, $cardId);

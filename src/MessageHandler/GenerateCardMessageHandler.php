@@ -99,13 +99,13 @@ class GenerateCardMessageHandler
             return;
         }
 
-        $cratedTag = $this->kas->createCardTag(
+        $createdTag = $this->kas->createCardTag(
             $message->getBotUser(),
             $createdCard->id,
             $data['tag']
         );
 
-        if (empty($cratedTag)) {
+        if (empty($createdTag)) {
             $this->logger->error('Тэг не был добавлен в Kaiten');
 
             return;

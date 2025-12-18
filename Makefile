@@ -89,3 +89,6 @@ doctrine-diff: sf
 
 doctrine-migrate: c=doctrine:migrations:migrate
 doctrine-migrate: sf
+
+messenger: c=messenger:consume async -vv
+messenger: sf

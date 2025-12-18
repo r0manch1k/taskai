@@ -92,7 +92,7 @@ final class NewCompanyState implements StateInterface
                     $company->setDomain($conversation->domain);
                 }
 
-                $company->setUserID($kaitenUser->id);
+                $company->setUserId($kaitenUser->id);
                 $company->setToken($token);
 
                 $context->bus->setCompany($context->botUser, $company);

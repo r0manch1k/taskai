@@ -91,7 +91,7 @@ class GenerateCardMessageHandler
 
         $url = $this->kas->getCardUrl($message->getBotUser(), $message->getSpaceId(), $message->getChatId());
 
-        $this->bot->sendMessage($message->getChatId(), sprintf('Генерация задачи завершена. Вот сслыка: %s', $url));
+        $this->bot->sendMessage($message->getChatId(), sprintf('Генерация задачи завершена. Вот ссылка: %s', $url));
 
         if (empty($data['tag'])) {
             $this->logger->info('Тэг отсутствует. Пропускаем шаг.');

@@ -15,7 +15,7 @@ class BotResponseService
     public function __construct(
         // private BotCacheService $botCacheService,
         // private LoggerInterface $logger,
-        // private BotUserService $bus,
+        // private BotUserService botUserService,
         private Environment $twig,
     ) {
     }

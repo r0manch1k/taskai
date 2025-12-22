@@ -9,7 +9,7 @@ use App\Service\BotCacheService;
 use App\Service\BotResponseService;
 use App\Service\BotUserService;
 use App\Service\CompanyService;
-use App\Service\KaitenApiService;
+use App\Service\KaitenApiClient;
 use Longman\TelegramBot\Telegram;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -21,13 +21,13 @@ final class Context
         public BotUser $botUser,
         public Telegram $telegram,
         public ?string $text,
-        public BotResponseService $brs,
-        public BotCacheService $bcs,
-        public BotUserService $bus,
+        public BotResponseService $botResponseService,
+        public BotCacheService $botCacheService,
+        public BotUserService $botUserService,
         public LoggerInterface $logger,
-        public KaitenApiService $kas,
-        public CompanyService $cs,
-        public MessageBusInterface $mbus,
+        public KaitenApiClient $kaitenApiClient,
+        public CompanyService $companyService,
+        public MessageBusInterface $messageBusInterface,
     ) {
     }
 }

@@ -8,7 +8,7 @@ use App\Service\BotCacheService;
 use App\Service\BotResponseService;
 use App\Service\BotUserService;
 use App\Service\CompanyService;
-use App\Service\KaitenApiService;
+use App\Service\KaitenApiClient;
 use Longman\TelegramBot\Telegram;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -18,13 +18,13 @@ class Bot extends Telegram
     public function __construct(
         string $token,
         string $username,
-        private BotResponseService $brs,
-        private BotCacheService $bcs,
-        private BotUserService $bus,
+        private BotResponseService $botResponseService,
+        private BotCacheService $botCacheService,
+        private BotUserService $botUserService,
         private LoggerInterface $logger,
-        private KaitenApiService $kas,
-        private CompanyService $cs,
-        private MessageBusInterface $mbus,
+        private KaitenApiClient $kaitenApiClient,
+        private CompanyService $companyService,
+        private MessageBusInterface $messageBusInterface,
     ) {
         parent::__construct($token, $username);
 
@@ -35,13 +35,13 @@ class Bot extends Telegram
 
         foreach ($commands as $name => $_) {
             $this->setCommandConfig($name, [
-                'brs' => $this->brs,
-                'bcs' => $this->bcs,
-                'bus' => $this->bus,
+                'botResponseService' => $this->botResponseService,
+                'botCacheService' => $this->botCacheService,
+                'botUserService' => $this->botUserService,
                 'logger' => $this->logger,
-                'kas' => $this->kas,
-                'cs' => $this->cs,
-                'mbus' => $this->mbus,
+                'kaitenApiClient' => $this->kaitenApiClient,
+                'companyService' => $this->companyService,
+                'messageBusInterface' => $this->messageBusInterface,
             ]);
         }
     }

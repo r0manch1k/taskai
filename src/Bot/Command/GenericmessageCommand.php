@@ -14,7 +14,7 @@ use App\Service\BotCacheService;
 use App\Service\BotResponseService;
 use App\Service\BotUserService;
 use App\Service\CompanyService;
-use App\Service\KaitenApiService;
+use App\Service\KaitenApiClient;
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Entities\Keyboard;
 use Longman\TelegramBot\Entities\ServerResponse;
@@ -22,6 +22,7 @@ use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Throwable;
 
 class GenericmessageCommand extends SystemCommand
 {
@@ -50,17 +51,17 @@ class GenericmessageCommand extends SystemCommand
         /**
          * @var BotCacheService
          */
-        $bcs = $this->getConfig()['bcs'];
+        $botCacheService = $this->getConfig()['botCacheService'];
 
         /**
          * @var BotResponseService
          */
-        $brs = $this->getConfig()['brs'];
+        $botResponseService = $this->getConfig()['botResponseService'];
 
         /**
          * @var BotUserService
          */
-        $bus = $this->getConfig()['bus'];
+        $botUserService = $this->getConfig()['botUserService'];
 
         /**
          * @var LoggerInterface
@@ -68,19 +69,19 @@ class GenericmessageCommand extends SystemCommand
         $logger = $this->getConfig()['logger'];
 
         /**
-         * @var KaitenApiService
+         * @var KaitenApiClient
          */
-        $kas = $this->getConfig()['kas'];
+        $kaitenApiClient = $this->getConfig()['kaitenApiClient'];
 
         /**
          * @var CompanyService
          */
-        $cs = $this->getConfig()['cs'];
+        $companyService = $this->getConfig()['companyService'];
 
         /**
          * @var MessageBusInterface
          */
-        $mbus = $this->getConfig()['mbus'];
+        $messageBusInterface = $this->getConfig()['messageBusInterface'];
 
         $message = $this->getMessage();
         $chat = $message->getChat();
@@ -88,9 +89,17 @@ class GenericmessageCommand extends SystemCommand
         $chatId = $chat->getId();
         $userId = $user->getId();
         $text = trim($message->getText(true));
-        $botUser = $bus->getBotUser($chatId);
+        $botUser = $botUserService->getBotUser($chatId);
 
-        $context = new Context($chatId, $botUser, $this->telegram, $text, $brs, $bcs, $bus, $logger, $kas, $cs, $mbus);
+        $context = new Context($chatId, $botUser, $this->telegram, $text, $botResponseService, $botCacheService, $botUserService, $logger, $kaitenApiClient, $companyService, $messageBusInterface);
+
+        // На всякий случай готовим сообщение здесь (если какая-нибудь внештатная ситуация)
+        $data = [
+            'parse_mode' => 'HTML',
+            'reply_markup' => Keyboard::remove(),
+            'chat_id'      => $chatId,
+            'text' => $context->botResponseService->unknown(),
+        ];
 
         // Баг импорта
         new NewCompanyConversation(NewCompanyConversationStep::Start);
@@ -99,7 +108,7 @@ class GenericmessageCommand extends SystemCommand
         // Начинаем диалоги, если введено стартовое сообщение для них
         switch ($text) {
             case NewCompanyConversationStep::Start->value:
-                $bcs->getConversation(
+                $botCacheService->getConversation(
                     $chatId,
                     $userId,
                     new NewCompanyConversation(
@@ -109,7 +118,7 @@ class GenericmessageCommand extends SystemCommand
                 );
                 break;
             case GenerateCardConversationStep::Start->value:
-                $bcs->getConversation(
+                $botCacheService->getConversation(
                     $chatId,
                     $userId,
                     new GenerateCardConversation(
@@ -120,23 +129,34 @@ class GenericmessageCommand extends SystemCommand
                 break;
         }
 
-        $conversation = $bcs->getConversation($chatId, $userId);
+        $conversation = $botCacheService->getConversation($chatId, $userId);
 
         if (null === $conversation) {
-            $data = [
-                'parse_mode' => 'HTML',
-                'reply_markup' => Keyboard::remove(),
-                'chat_id'      => $chatId,
-                'text' => $context->brs->unknown(),
-            ];
+            $data['text'] = $context->botResponseService->unknown();
 
             return Request::sendMessage($data);
         }
 
         $resolver = new Resolver();
 
-        $state = $resolver->resolve($conversation);
+        try {
+            $state = $resolver->resolve($conversation);
+        } catch (Throwable $e) {
+            $logger->error(sprintf('Ошибка при резолве диалога: %s', $e->getMessage()));
+            $data['text'] = $context->botResponseService->error();
 
-        return $state->handle($context, $conversation);
+            return Request::sendMessage($data);
+        }
+
+        try {
+            $response = $state->handle($context, $conversation);
+        } catch (Throwable $e) {
+            $logger->error(sprintf('Ошибка при хэндле сообщения: %s', $e->getMessage()));
+            $data['text'] = $context->botResponseService->error();
+
+            return Request::sendMessage($data);
+        }
+
+        return $response;
     }
 }

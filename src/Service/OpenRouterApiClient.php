@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 
-class OpenRouterApiService
+class OpenRouterApiClient
 {
     public function __construct(
         private LoggerInterface $logger,

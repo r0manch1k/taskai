@@ -14,11 +14,11 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Throwable;
 
-class KaitenApiService
+class KaitenApiClient
 {
     public function __construct(
         private LoggerInterface $logger,
-        private CompanyService $cs,
+        private CompanyService $companyService,
     ) {
     }
 
@@ -74,7 +74,7 @@ class KaitenApiService
             return [];
         }
 
-        $company = $this->cs->getCompany($companyId);
+        $company = $this->companyService->getCompany($companyId);
 
         $domain = $company->getDomain();
         $token = $company->getToken();
@@ -138,7 +138,7 @@ class KaitenApiService
             return [];
         }
 
-        $company = $this->cs->getCompany($companyId);
+        $company = $this->companyService->getCompany($companyId);
 
         $spaceId = $company->getSpaceId();
         if (null === $spaceId) {
@@ -212,7 +212,7 @@ class KaitenApiService
             return [];
         }
 
-        $company = $this->cs->getCompany($companyId);
+        $company = $this->companyService->getCompany($companyId);
 
         $spaceId = $company->getSpaceId();
         if (null === $spaceId) {
@@ -292,7 +292,7 @@ class KaitenApiService
             return [];
         }
 
-        $company = $this->cs->getCompany($companyId);
+        $company = $this->companyService->getCompany($companyId);
 
         $spaceId = $company->getSpaceId();
         if (null === $spaceId) {
@@ -360,7 +360,7 @@ class KaitenApiService
             return $cardDto;
         }
 
-        $company = $this->cs->getCompany($companyId);
+        $company = $this->companyService->getCompany($companyId);
 
         $spaceId = $company->getSpaceId();
         if (null === $spaceId) {
@@ -440,7 +440,7 @@ class KaitenApiService
             return '';
         }
 
-        $company = $this->cs->getCompany($companyId);
+        $company = $this->companyService->getCompany($companyId);
 
         $spaceId = $company->getSpaceId();
         if (null === $spaceId) {
@@ -513,7 +513,7 @@ class KaitenApiService
             return '';
         }
 
-        $company = $this->cs->getCompany($companyId);
+        $company = $this->companyService->getCompany($companyId);
 
         $domain = $company->getDomain();
 

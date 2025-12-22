@@ -7,8 +7,8 @@ namespace App\MessageHandler;
 use App\Bot\Bot;
 use App\Message\GenerateCardMessage;
 use App\Service\CompanyService;
-use App\Service\KaitenApiService;
-use App\Service\OpenRouterApiService;
+use App\Service\KaitenApiClient;
+use App\Service\OpenRouterApiClient;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -19,10 +19,10 @@ class GenerateCardMessageHandler
 {
     public function __construct(
         private LoggerInterface $logger,
-        private KaitenApiService $kas,
+        private KaitenApiClient $kaitenApiClient,
         private Environment $twig,
-        private OpenRouterApiService $oras,
-        private CompanyService $cs,
+        private OpenRouterApiClient $openRouterApiClient,
+        private CompanyService $companyService,
         private HttpClientInterface $http,
         private Bot $bot,
     ) {
@@ -30,7 +30,7 @@ class GenerateCardMessageHandler
 
     public function __invoke(GenerateCardMessage $message)
     {
-        $tags = $this->kas->getTags($message->getBotUser());
+        $tags = $this->kaitenApiClient->getTags($message->getBotUser());
 
         $this->logger->info('Начинаем формирование промпта для ИИ');
         $prompt = $this->twig->render('prompts/generate_card.html.twig', [
@@ -38,8 +38,12 @@ class GenerateCardMessageHandler
             'tags' => $tags,
         ]);
 
-        $content = $this->oras->chat($prompt);
+        $content = $this->openRouterApiClient->chat($prompt);
         $this->logger->info('Получен ответ от ИИ');
+
+        if (preg_match('/^```(?:json)?\s*(.*?)\s*```$/s', $content, $matches)) {
+            $content = $matches[1];
+        }
 
         $data = json_decode($content, true);
         if (JSON_ERROR_NONE !== json_last_error()) {
@@ -66,7 +70,7 @@ class GenerateCardMessageHandler
         $cardDto = new \App\Dto\CardDto(
             id: null,
             title: (string) $data['title'],
-            boardId: $this->cs->getCompany($message->getBotUser()->getCompanyId())->getBoardId(),
+            boardId: $this->companyService->getCompany($message->getBotUser()->getCompanyId())->getBoardId(),
             asap: $message->getAsap(),
             dueDate: $message->getDueDate(),
             dueDateTimePresent: $message->getDueDateTimePresent(),
@@ -75,7 +79,7 @@ class GenerateCardMessageHandler
             responsibleId: $message->getResponsibleId(),
         );
 
-        $createdCard = $this->kas->createCard(
+        $createdCard = $this->kaitenApiClient->createCard(
             $message->getBotUser(),
             $cardDto
         );
@@ -89,7 +93,7 @@ class GenerateCardMessageHandler
         }
         $this->logger->info('Карточка успешно создана в Kaiten');
 
-        $url = $this->kas->getCardUrl($message->getBotUser(), $message->getSpaceId(), $message->getChatId());
+        $url = $this->kaitenApiClient->getCardUrl($message->getBotUser(), $message->getSpaceId(), $createdCard->id);
 
         $this->bot->sendMessage($message->getChatId(), sprintf('Генерация задачи завершена. Вот ссылка: %s', $url));
 
@@ -99,7 +103,7 @@ class GenerateCardMessageHandler
             return;
         }
 
-        $createdTag = $this->kas->createCardTag(
+        $createdTag = $this->kaitenApiClient->createCardTag(
             $message->getBotUser(),
             $createdCard->id,
             $data['tag']

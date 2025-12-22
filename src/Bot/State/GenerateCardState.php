@@ -36,9 +36,9 @@ final class GenerateCardState implements StateInterface
         switch ($conversation->step) {
             // Сообщение с просьбой описать задачу
             case GenerateCardConversationStep::SetRawDescription:
-                $data['text'] = $context->brs->generateCard($conversation);
+                $data['text'] = $context->botResponseService->generateCard($conversation);
 
-                $context->bcs->getConversation(
+                $context->botCacheService->getConversation(
                     $chatId,
                     $userId,
                     new GenerateCardConversation(
@@ -65,7 +65,7 @@ final class GenerateCardState implements StateInterface
                     return Request::sendMessage($data);
                 }
 
-                $data['text'] = $context->brs->generateCard($conversation);
+                $data['text'] = $context->botResponseService->generateCard($conversation);
 
                 $buttons = ['Да', 'Нет'];
 
@@ -76,7 +76,7 @@ final class GenerateCardState implements StateInterface
 
                 $data['reply_markup'] = $keyboard;
 
-                $context->bcs->getConversation(
+                $context->botCacheService->getConversation(
                     $chatId,
                     $userId,
                     new GenerateCardConversation(
@@ -102,9 +102,9 @@ final class GenerateCardState implements StateInterface
                     return Request::sendMessage($data);
                 }
 
-                $data['text'] = $context->brs->generateCard($conversation);
+                $data['text'] = $context->botResponseService->generateCard($conversation);
 
-                $context->bcs->getConversation(
+                $context->botCacheService->getConversation(
                     $chatId,
                     $userId,
                     new GenerateCardConversation(
@@ -140,7 +140,7 @@ final class GenerateCardState implements StateInterface
                     return Request::sendMessage($data);
                 }
 
-                $users = $context->kas->getSpaceUsers($context->botUser);
+                $users = $context->kaitenApiClient->getSpaceUsers($context->botUser);
 
                 if (empty($users)) {
                     $data['text'] = 'Не найдено пользователей в выбранном пространстве! Добавьте и начните снова.';
@@ -160,7 +160,7 @@ final class GenerateCardState implements StateInterface
 
                 $data['reply_markup'] = $keyboard;
 
-                $context->bcs->getConversation(
+                $context->botCacheService->getConversation(
                     $chatId,
                     $userId,
                     new GenerateCardConversation(
@@ -174,7 +174,7 @@ final class GenerateCardState implements StateInterface
                     true
                 );
 
-                $data['text'] = $context->brs->generateCard($conversation);
+                $data['text'] = $context->botResponseService->generateCard($conversation);
 
                 return Request::sendMessage($data);
 
@@ -182,14 +182,8 @@ final class GenerateCardState implements StateInterface
             case GenerateCardConversationStep::Confirm:
                 $email = $text;
 
-                /**
-                 * @var ?int
-                 */
                 $responsibleId = null;
 
-                /**
-                 * @var ?string
-                 */
                 $responsibleEmail = null;
 
                 foreach ($conversation->users as $user) {
@@ -220,7 +214,7 @@ final class GenerateCardState implements StateInterface
 
                 $conversation->responsibleEmail = $responsibleEmail;
 
-                $data['text'] = $context->brs->generateCard($conversation);
+                $data['text'] = $context->botResponseService->generateCard($conversation);
 
                 $buttons = ['Начать заново', 'Подтвердить'];
 
@@ -231,7 +225,7 @@ final class GenerateCardState implements StateInterface
 
                 $data['reply_markup'] = $keyboard;
 
-                $context->bcs->getConversation(
+                $context->botCacheService->getConversation(
                     $chatId,
                     $userId,
                     new GenerateCardConversation(
@@ -255,7 +249,7 @@ final class GenerateCardState implements StateInterface
 
                 switch ($input) {
                     case 'Начать заново':
-                        $context->bcs->getConversation(
+                        $context->botCacheService->getConversation(
                             $chatId,
                             $userId,
                             new GenerateCardConversation(GenerateCardConversationStep::SetAsap),
@@ -266,10 +260,10 @@ final class GenerateCardState implements StateInterface
 
                         return Request::sendMessage($data);
                     case 'Подтвердить':
-                        $company = $context->cs->getCompany($context->botUser->getCompanyId());
+                        $company = $context->companyService->getCompany($context->botUser->getCompanyId());
 
                         $message = new GenerateCardMessage(
-                            $context->botUser->getCompanyId(),
+                            $company->getSpaceId(),
                             $chatId,
                             $context->botUser,
                             $conversation->rawDescription,
@@ -280,7 +274,7 @@ final class GenerateCardState implements StateInterface
                             $conversation->responsibleId
                         );
 
-                        $context->mbus->dispatch($message);
+                        $context->messageBusInterface->dispatch($message);
 
                         $data['text'] = 'Подтверждено. Задача будет создана и ссылка на неё появится в чате.' . PHP_EOL . PHP_EOL . 'Вы можете начать заново /start.';
 
@@ -292,7 +286,7 @@ final class GenerateCardState implements StateInterface
                 return Request::sendMessage($data);
         }
 
-        $data['text'] = $context->brs->unknown();
+        $data['text'] = $context->botResponseService->unknown();
 
         return Request::sendMessage($data);
     }

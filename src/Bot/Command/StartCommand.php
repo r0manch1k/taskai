@@ -53,17 +53,17 @@ class StartCommand extends SystemCommand
         /**
          * @var BotCacheService
          */
-        $bcs = $this->getConfig()['bcs'];
+        $botCacheService = $this->getConfig()['botCacheService'];
 
         /**
          * @var BotUserService
          */
-        $bus = $this->getConfig()['bus'];
+        $botUserService = $this->getConfig()['botUserService'];
 
         /**
          * @var BotResponseService
          */
-        $brs = $this->getConfig()['brs'];
+        $botResponseService = $this->getConfig()['botResponseService'];
 
         $message = $this->getMessage();
 
@@ -72,9 +72,9 @@ class StartCommand extends SystemCommand
         $chat_id = $chat->getId();
         $user_id = $user->getId();
 
-        $bcs->invalidateBotUser($chat_id, $user_id);
+        $botCacheService->invalidateBotUser($chat_id, $user_id);
 
-        $botUser = $bus->getBotUser($user_id);
+        $botUser = $botUserService->getBotUser($user_id);
         $companies = $botUser->getCompanies();
 
         $buttons = [];
@@ -100,7 +100,7 @@ class StartCommand extends SystemCommand
         // поэтому начинается диалог выбора доски, но если пользователь
         // выбирает опцию добавления новаого аккаунта, то диалог в
         // кэше перезапишется в GenericmessageCommand
-        $bcs->getConversation(
+        $botCacheService->getConversation(
             $chat_id,
             $user_id,
             new SelectBoardConversation(
@@ -109,7 +109,7 @@ class StartCommand extends SystemCommand
             true
         );
 
-        return $this->replyToChat($brs->start(), [
+        return $this->replyToChat($botResponseService->start(), [
             'reply_markup' => $keyboard,
             'parse_mode' => 'HTML',
         ]);

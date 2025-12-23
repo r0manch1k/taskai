@@ -31,6 +31,9 @@ class Company
     #[ORM\Column(nullable: true)]
     private ?int $boardId = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $userId = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -92,6 +95,18 @@ class Company
     public function setBoardId(?int $boardId): static
     {
         $this->boardId = $boardId;
+
+        return $this;
+    }
+
+    public function getUserId(): ?int
+    {
+        return $this->userId;
+    }
+
+    public function setUserId(?int $userId): static
+    {
+        $this->userId = $userId;
 
         return $this;
     }

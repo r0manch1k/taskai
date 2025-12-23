@@ -35,9 +35,9 @@ final class NewCompanyState implements StateInterface
         switch ($conversation->step) {
             // Сообщение с просьбой указать домен
             case NewCompanyConversationStep::SetDomain:
-                $data['text'] = $context->brs->newCompany($conversation);
+                $data['text'] = $context->botResponseService->newCompany($conversation);
 
-                $context->bcs->getConversation(
+                $context->botCacheService->getConversation(
                     $chatId,
                     $userId,
                     new NewCompanyConversation(
@@ -59,9 +59,9 @@ final class NewCompanyState implements StateInterface
                     return Request::sendMessage($data);
                 }
 
-                $data['text'] = $context->brs->newCompany($conversation);
+                $data['text'] = $context->botResponseService->newCompany($conversation);
 
-                $context->bcs->getConversation(
+                $context->botCacheService->getConversation(
                     $chatId,
                     $userId,
                     new NewCompanyConversation(
@@ -77,9 +77,9 @@ final class NewCompanyState implements StateInterface
             case NewCompanyConversationStep::Done:
                 $token = $text;
 
-                $ok = $context->kas->ping($conversation->domain, $token);
+                $kaitenUser = $context->kaitenApiClient->getCurrentUser($conversation->domain, $token);
 
-                if (!$ok) {
+                if (!$kaitenUser->id) {
                     $data['text'] = 'Ключ доступа не прошёл проверку. Введите другой!';
 
                     return Request::sendMessage($data);
@@ -92,18 +92,19 @@ final class NewCompanyState implements StateInterface
                     $company->setDomain($conversation->domain);
                 }
 
+                $company->setUserId($kaitenUser->id);
                 $company->setToken($token);
 
-                $context->bus->setCompany($context->botUser, $company);
+                $context->botUserService->setCompany($context->botUser, $company);
 
-                $context->bcs->getConversation($chatId, $userId, null, true);
+                $context->botCacheService->getConversation($chatId, $userId, null, true);
 
                 $context->telegram->executeCommand('start');
 
                 return Request::emptyResponse();
         }
 
-        $data['text'] = $context->brs->unknown();
+        $data['text'] = $context->botResponseService->unknown();
 
         return Request::sendMessage($data);
     }

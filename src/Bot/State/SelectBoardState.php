@@ -6,6 +6,7 @@ namespace App\Bot\State;
 
 use App\Bot\Context;
 use App\Bot\Conversation\Conversation;
+use App\Bot\Conversation\GenerateCardConversationStep;
 use App\Bot\Conversation\SelectBoardConversation;
 use App\Bot\Conversation\SelectBoardConversationStep;
 use InvalidArgumentException;
@@ -18,7 +19,7 @@ final class SelectBoardState implements StateInterface
     public function handle(Context $context, Conversation $conversation): ServerResponse
     {
         if (!$conversation instanceof SelectBoardConversation) {
-            throw new InvalidArgumentException('Ожидалось NewCompanyConversation');
+            throw new InvalidArgumentException('Ожидалось SelectBoardConversation');
         }
 
         $chatId = $context->chatId;
@@ -40,14 +41,14 @@ final class SelectBoardState implements StateInterface
 
                 if (null === $company) {
                     $context->logger->error('Комания - нулл');
-                    $data['text'] = $context->brs->error();
+                    $data['text'] = $context->botResponseService->error();
 
                     return Request::sendMessage($data);
                 }
 
-                $context->bus->setCompanyId($context->botUser, $company->getId());
+                $context->botUserService->setCompanyId($context->botUser, $company->getId());
 
-                $spaces = $context->kas->getSpaces($context->botUser);
+                $spaces = $context->kaitenApiClient->getSpaces($context->botUser);
 
                 if (empty($spaces)) {
                     $data['text'] = 'У вас нет пространств. Создайте и попробуйте ещё раз';
@@ -55,10 +56,9 @@ final class SelectBoardState implements StateInterface
                     return Request::sendMessage($data);
                 }
 
-                $data['text'] = $context->brs->selectCompany($conversation);
+                $data['text'] = $context->botResponseService->selectCompany($conversation);
 
                 $buttons = [];
-
                 foreach ($spaces as $space) {
                     $buttons[] = [$space->title];
                 }
@@ -70,7 +70,7 @@ final class SelectBoardState implements StateInterface
 
                 $data['reply_markup'] = $keyboard;
 
-                $context->bcs->getConversation(
+                $context->botCacheService->getConversation(
                     $chatId,
                     $userId,
                     new SelectBoardConversation(
@@ -93,17 +93,29 @@ final class SelectBoardState implements StateInterface
                     }
                 }
 
-                $company = $context->cs->getCompany($context->botUser->getCompanyId());
+                $company = $context->companyService->getCompany($context->botUser->getCompanyId());
 
                 if (null === $space) {
                     $data['text'] = 'Указанное пространство не найдено. Попробуйте ещё раз.';
 
+                    $buttons = [];
+                    foreach ($spaces as $space) {
+                        $buttons[] = [$space->title];
+                    }
+
+                    /**
+                     * @psalm-suppress TooManyArguments
+                     */
+                    $keyboard = new Keyboard(...$buttons);
+
+                    $data['reply_markup'] = $keyboard;
+
                     return Request::sendMessage($data);
                 }
 
-                $context->cs->setSpaceId($company, $space->id);
+                $context->companyService->setSpaceId($company, $space->id);
 
-                $boards = $context->kas->getBoards($context->botUser);
+                $boards = $context->kaitenApiClient->getBoards($context->botUser);
 
                 if (empty($boards)) {
                     $data['text'] = 'У вас нет досок. Создайте и попробуйте ещё раз';
@@ -111,10 +123,9 @@ final class SelectBoardState implements StateInterface
                     return Request::sendMessage($data);
                 }
 
-                $data['text'] = $context->brs->selectCompany($conversation);
+                $data['text'] = $context->botResponseService->selectCompany($conversation);
 
                 $buttons = [];
-
                 foreach ($boards as $board) {
                     $buttons[] = [$board->title];
                 }
@@ -126,7 +137,7 @@ final class SelectBoardState implements StateInterface
 
                 $data['reply_markup'] = $keyboard;
 
-                $context->bcs->getConversation(
+                $context->botCacheService->getConversation(
                     $chatId,
                     $userId,
                     new SelectBoardConversation(
@@ -150,19 +161,31 @@ final class SelectBoardState implements StateInterface
                     }
                 }
 
-                $company = $context->cs->getCompany($context->botUser->getCompanyId());
+                $company = $context->companyService->getCompany($context->botUser->getCompanyId());
 
                 if (null === $board) {
                     $data['text'] = 'Указанная доска не найдена. Попробуйте ещё раз.';
 
+                    $buttons = [];
+                    foreach ($boards as $board) {
+                        $buttons[] = [$board->title];
+                    }
+
+                    /**
+                     * @psalm-suppress TooManyArguments
+                     */
+                    $keyboard = new Keyboard(...$buttons);
+
+                    $data['reply_markup'] = $keyboard;
+
                     return Request::sendMessage($data);
                 }
 
-                $context->cs->setBoardId($company, $board->id);
+                $context->companyService->setBoardId($company, $board->id);
 
-                $data['text'] = $context->brs->selectCompany($conversation);
+                $data['text'] = $context->botResponseService->selectCompany($conversation);
 
-                $buttons = ['Создать задачу'];
+                $buttons = [GenerateCardConversationStep::Start->value];
 
                 /**
                  * @psalm-suppress TooManyArguments
@@ -171,13 +194,13 @@ final class SelectBoardState implements StateInterface
 
                 $data['reply_markup'] = $keyboard;
 
-                $context->bcs->getConversation($chatId, $userId, null, true);
+                $context->botCacheService->getConversation($chatId, $userId, null, true);
 
                 return Request::sendMessage($data);
 
         }
 
-        $data['text'] = $context->brs->unknown();
+        $data['text'] = $context->botResponseService->unknown();
 
         return Request::sendMessage($data);
     }
